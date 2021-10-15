@@ -1,11 +1,11 @@
 import React, {Component} from 'react'
-import {ListGroup, Card,CardGroup,Row,Col, Button, Container} from 'react-bootstrap'
+import {Card,Row,Col, Button, Container, Image} from 'react-bootstrap'
 import './AssetList.css'
 
 var items = [
     {
         name: "machine-001",
-        status: "running",
+        status: "Running",
         start: "2021-10-08 8:00",
         duration: "24hr 14mins",
         end: "",
@@ -15,7 +15,7 @@ var items = [
     },
     {
         name: "machine-002",
-        status: "running",
+        status: "Idle",
         start: "2021-10-08 8:00",
         duration: "24hr 14mins",
         end: "",
@@ -25,7 +25,7 @@ var items = [
     },
     {
         name: "machine-003",
-        status: "running",
+        status: "Running",
         start: "2021-10-08 8:00",
         duration: "24hr 14mins",
         end: "",
@@ -35,7 +35,7 @@ var items = [
     },
     {
         name: "machine-004",
-        status: "running",
+        status: "Stop",
         start: "2021-10-08 8:00",
         duration: "24hr 14mins",
         end: "",
@@ -45,7 +45,7 @@ var items = [
     },
     {
         name: "machine-005",
-        status: "running",
+        status: "Breakdown",
         start: "2021-10-08 8:00",
         duration: "24hr 14mins",
         end: "",
@@ -54,6 +54,7 @@ var items = [
         display: true
     },
 ]
+
 
 class AssetList extends React.Component {
     constructor(props) {
@@ -64,12 +65,12 @@ class AssetList extends React.Component {
     }
 
     searchAsset(filter){
-        console.log(filter)
         var items = this.state.items;
+        
         for (var i = 0; i < this.state.items.length; i++) {
             var itemNow = items[i];
             var txtValue = itemNow.name+itemNow.status+itemNow.start+itemNow.duration
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            if (txtValue.toUpperCase().indexOf(filter.toUpperCase()) > -1) {
                 items[i].display = true;
             } else {
                 items[i].display = false;
@@ -108,6 +109,58 @@ class AssetList extends React.Component {
         //     });
         //   })
     }
+
+    searchBox(){
+        return (
+            <Container>
+                <label for="asset-search">Search asset:&nbsp;</label>
+                <input type="search" id="asset-search" name="q" aria-label="Search through site content" onChange={event => this.searchAsset(event.target.value)}/>
+                            
+            </Container>
+        )
+    }
+
+    statusDetail(){
+        return (
+            <Container>
+                <div style={{backgroundColor: this.getBackgroundColor('Running')}} className='statusBox'></div><div style={{float: 'left', marginRight: '2%'}}><span>Running</span></div>
+                <div style={{backgroundColor: this.getBackgroundColor('Stop')}} className='statusBox'></div><div style={{float: 'left', marginRight: '2%'}}><span>Stop</span></div>
+                <div style={{backgroundColor: this.getBackgroundColor('Breakdown')}} className='statusBox'></div><div style={{float: 'left', marginRight: '2%'}}><span>Breakdown</span></div>
+                <div style={{backgroundColor: this.getBackgroundColor('Idle')}} className='statusBox'></div><div style={{float: 'left', marginRight: '2%'}}><span>Idle</span></div>
+                
+            </Container>
+        )
+    }
+
+    getBackgroundColor(status){
+        if (status === 'Running'){
+            return '#4caf50'
+        }
+        if (status === 'Stop'){
+            return '#2196f3'
+        }
+        if (status === 'Breakdown'){
+            return '#f44336'
+        }
+        if (status === 'Idle'){
+            return '#607d8b'
+        }
+    }
+
+    getUserInfo(){
+        return (
+            <Row>
+                <Col style={{textAlign: 'right'}}>
+                    <span className='userInfo'>pathawee.somsak@gmail.com</span><br/>
+                    <span className='userInfo'>Administrator</span><br/>
+                </Col>
+                <Col>
+                    <Image src="src/resource/image/user.png" rounded className='userImage'/>
+                </Col>
+            </Row>
+        )
+    }
+
     render() {
         if (this.state.isLoaded){
             var myItems = [];
@@ -115,22 +168,19 @@ class AssetList extends React.Component {
                 if (this.state.items[i].display){
                     myItems.push(
                         <Col>
-                            <Card style={{ width: '200px' , height: '400px'}}>
-                                <Container className='flexBox'>
-                                    <Card.Img variant="top" src={this.state.items[i].image} style={{ maxWidth: '100%', maxHeight: '100%', display: 'block', marginLeft: 'auto',marginRight: 'auto',marginTop: 'auto',marginBottom: 'auto'}}/>
-                                </Container>
+                            <Card style={{ width: '200px' , height: '280px', backgroundColor: this.getBackgroundColor(this.state.items[i].status)}}>
                                 <Card.Body>
                                 <Card.Title>{this.state.items[i].name}</Card.Title>
+                                <Container className='flexBox'>
+                                    <Card.Img variant="top" src={this.state.items[i].image} className='machineImage'/>
+                                </Container>
+                                
                                 <Card.Text>
-                                    Status: {this.state.items[i].status}
+                                    Status: {this.state.items[i].status}<br/>
+                                    Start: {this.state.items[i].start}<br/>
+                                    Duration: {this.state.items[i].duration}<br/>
                                 </Card.Text>
-                                <Card.Text>
-                                    Start: {this.state.items[i].start}
-                                </Card.Text>
-                                <Card.Text>
-                                    Duration: {this.state.items[i].duration}
-                                </Card.Text>
-                                <Button variant="primary">Go to machine</Button>
+                                <Button variant="info">Go to machine</Button>
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -140,11 +190,23 @@ class AssetList extends React.Component {
 
             return (
                 <Container>
-                    <Container style={{margin: '3%'}}>
-                        <label for="asset-search">Search asset:&nbsp;</label>
-                        <input type="search" id="asset-search" name="q" aria-label="Search through site content" onChange={event => this.searchAsset(event.target.value)}/>
-                    </Container>
-                    <Row xs="auto" style={{margin: '3%'}}>
+                    <Row style={{margin: '3%'}}>
+                        <Col>
+                            <h1>Asset Advisor</h1>
+                        </Col>
+                        <Col xs={4}>
+                            {this.getUserInfo()}
+                        </Col>
+                    </Row>
+                    <Row style={{margin: '2%'}}>
+                        <Col>
+                            {this.searchBox()}
+                        </Col>
+                        <Col xs={5}>
+                            {this.statusDetail()}
+                        </Col>
+                    </Row>
+                    <Row xs="auto" style={{margin: '2%'}}>
                         {myItems}
                     </Row>
                 </Container>
